@@ -1,0 +1,139 @@
+features:
+  llm_refinement:
+    enabled: true
+    model: "gpt-4o"
+    temperature: 0.1
+    max_tokens: 2000
+    fallback_to_base: false
+    prompt_types:
+      - structure
+      - implementation
+      - tests
+      - review
+      - documentation
+
+  gitlab_duo:
+    enabled: true
+    default_branch: "main"
+    auto_approve: false
+    labels: ["ai-assisted"]
+    template_path: ".gitlab/merge_request_templates/python_feature.md"
+
+  jira_integration:
+    story_points_field: "customfield_10016"
+    acceptance_criteria_field: "customfield_10017"
+    update_status: true
+    status_mapping:
+      in_progress: "In Progress"
+      in_review: "Code Review"
+      done: "Done"
+
+logging:
+  level: "INFO"
+  prompt_refinement: true
+  file: "logs/agent.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+prompts:
+  base:
+    structure: |
+      /duo suggest
+      Task: Generate Python project structure
+      Requirements:
+      1. Follow PEP 8 and clean architecture principles
+      2. Create modular and maintainable structure
+      3. Include proper package initialization
+      4. Setup configuration management
+      5. Add logging and error handling
+      
+      Expected structure:
+      - src/
+        - {module_name}/
+          - __init__.py
+          - models/
+          - services/
+          - utils/
+          - config/
+      - tests/
+        - __init__.py
+        - test_{module_name}/
+
+    implementation: |
+      /duo suggest
+      Task: Implement core functionality
+      Requirements:
+      1. Follow SOLID principles
+      2. Include type hints
+      3. Add comprehensive error handling
+      4. Implement logging
+      5. Add configuration management
+
+      Focus on:
+      - Code quality
+      - Performance
+      - Security
+      - Maintainability
+
+    tests: |
+      /duo test
+      Task: Generate test suite
+      Requirements:
+      1. Unit tests with pytest
+      2. Integration tests
+      3. Mock external dependencies
+      4. Test edge cases
+      5. Measure coverage
+
+      Include:
+      - Setup and teardown
+      - Test fixtures
+      - Parameterized tests
+      - Error scenarios
+
+    review: |
+      /duo review
+      Task: Review implementation
+      Focus on:
+      1. Code quality and standards
+      2. Performance optimization
+      3. Security best practices
+      4. Error handling
+      5. Documentation
+
+    documentation: |
+      /duo document
+      Task: Generate documentation
+      Requirements:
+      1. API documentation
+      2. Usage examples
+      3. Configuration guide
+      4. Deployment instructions
+      5. Troubleshooting guide
+
+llm:
+  system_prompt: |
+    You are an expert software architect helping to refine GitLab Duo prompts.
+    Your task is to enhance the base prompts to be more specific to the story requirements.
+    Consider:
+    1. Technical requirements
+    2. Best practices
+    3. Security considerations
+    4. Performance optimization
+    5. Testing strategy
+
+  refinement_prompt: |
+    Given the Jira story details below, enhance the base prompt to be more specific
+    and actionable for GitLab Duo. Include concrete technical requirements and
+    implementation guidance.
+
+    Story Context:
+    - Key: {key}
+    - Summary: {summary}
+    - Description: {description}
+    - Acceptance Criteria: {acceptance_criteria}
+
+    Base Prompt:
+    {base_prompt}
+
+    Please provide an enhanced, context-aware prompt that will help GitLab Duo
+    generate better code for this specific story. 
